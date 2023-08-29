@@ -4,7 +4,7 @@
     <span class="text-20 ls-1">La plataforma para los cinefilos y críticos</span>
 
     <div class="medias">
-      <div v-for="a in [0, 1, 3, 4, 5, 6]" class="media" :key="a">
+      <div v-for="media in [0, 1, 3, 4, 5, 6]" class="media" :key="media">
         <img src="../assets/img/barbie-cartel.jpg" alt="">
         <span class="pt-2">Barbie the movie</span>
         <div class="media-statistics text-16">
@@ -14,11 +14,7 @@
             ☰
             <div class="tooltiptext">
               <div class="ec-stars-wrapper">
-                <a href="#" data-value="1" title="Votar con 1 estrellas">&#9733;</a>
-                <a href="#" data-value="2" title="Votar con 2 estrellas">&#9733;</a>
-                <a href="#" data-value="3" title="Votar con 3 estrellas">&#9733;</a>
-                <a href="#" data-value="4" title="Votar con 4 estrellas">&#9733;</a>
-                <a href="#" data-value="5" title="Votar con 5 estrellas">&#9733;</a>
+                <a v-for="point in [1,2,3,4,5]" :key="point" @click="updateReview(point, media)" data-value="1" title="Votar con 1 estrellas">&#9733;</a>
               </div>
             </div>
           </div>
@@ -33,7 +29,75 @@ export default {
   name: 'MediaBoard',
   props: {
     msg: String
-  }
+  },
+  data() {
+    return {
+      medias: []
+    }
+  },
+
+  methods: {
+    getMedias() {
+      fetch('http://localhost:8000/api/medias/medias')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Assuming the response is JSON
+      })
+      .then(data => {
+        // Use the data returned from the server
+        this.medias = data
+      })
+      .catch(error => {
+        // Handle any errors that occurred during the fetch.
+        console.error('There was a problem with the fetch operation:', error);
+      });
+    },
+
+    updateReview(rating, id) {
+      const formData = new FormData();
+
+      formData.append('rating', rating);
+
+      const params = new URLSearchParams(formData);
+
+      fetch(`https://localhost:8080/api/medias/medias/${id}/update-rating/`, {
+        method: 'POST',
+        body: params
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response
+      })
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error)
+      })
+    },
+
+    updateWatched(id) {
+      fetch(`https://localhost:8080/api/medias/medias/${id}/mark_as_watched/`, {
+        method: 'POST',
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response
+      })
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error)
+      })
+    }
+  },
 }
 </script>
 

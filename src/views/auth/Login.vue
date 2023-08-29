@@ -4,7 +4,7 @@
       <h2 class="login-title">Inicio de sesión</h2>
       <input type="text" placeholder="Correo">
       <input type="password" placeholder="Contraseña">
-      <div class="flat-button">Ingresar</div>
+      <div @click="login()" class="flat-button">Ingresar</div>
     </div>
   </div>
 </template>
@@ -14,6 +14,46 @@
 export default {
   name: 'Login',
   components: {
+  },
+
+  mounted() {
+  },
+
+  methods: {
+    login() {
+      const formData = {
+        grant_type: 'password',
+        username: 'admin',
+        password: 'admin',
+        client_id: 'FH2HatMve040MBZodDD3kJtaMfGJux9AxFfai8DZ',
+        client_secret: '2T06uFNcPXx6aeLS4ucCqW91d0W9UPANKhsM03imK8iD0YL1AkputiKMF0IF8mBxFvvcP42UxUjUtLl3OVvaLiWlBZ9007fMkG1sjYG4hRYl4dCKbJKrbGQM4zNaEotd'
+      };
+
+      const params = new URLSearchParams(formData);
+
+      fetch('https://localhost:8080/0/token', {
+        method: 'POST', // or 'PUT' or 'GET' etc.
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', // Set the content type
+          // You may need to set additional headers as needed
+        },
+        body: params // Set the encoded data as the request body
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response
+      })
+      .then(data => {
+        console.log(data);
+        localStorage.setItem('token', data.access_token00)
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+      });
+
+    }
   }
 }
 </script>
